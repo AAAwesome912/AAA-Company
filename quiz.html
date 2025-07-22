@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Accounting Trivia Quiz - AAA</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsive.css">
+
+  <style>
+    .quiz-container { max-width: 700px; margin: 50px auto; padding: 30px; background-color: #B2BEB5; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+    .question { font-size: 1.2em; margin-bottom: 15px;}
+    .answers button { display: block; width: 100%; margin: 8px 0; padding: 10px; font-size: 1em; background-color: #D0D9CD; border: 1px solid #687169; cursor: pointer; border-radius: 5px;}
+    .answers button.correct { background-color: #a5d6a7; }
+    .answers button.wrong { background-color: #ef9a9a; }
+    .result { margin-top: 15px; font-weight: bold; }
+    .next-btn, .stop-btn { margin-top: 20px; padding: 10px 20px; background-color: #78866B; color: white; border: none; cursor: pointer; border-radius: 5px; }
+    .next-btn:hover, .stop-btn:hover { background-color: #687169; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Accounting Trivia Quiz</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="quiz.html" class="active">Quiz</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="quiz-container">
+    <div id="quiz-content">
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <div class="result" id="result"></div>
+      <button class="next-btn" id="nextBtn" style="display:none;">Next Question</button>
+      <button class="stop-btn" id="stopBtn" style="display:none;">Stop Quiz</button>
+    </div>
+    <div id="final-score" style="display:none;"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { question: "What does CPA stand for?", options: ["Certified Public Accountant", "Corporate Planning Associate", "Chartered Performance Auditor", "Certified Payroll Advisor"], correct: 0 },
+      { question: "What is the primary purpose of an audit?", options: ["Hide company losses", "Detect and prevent tax evasion", "Verify the accuracy of financial records", "Calculate employee bonuses"], correct: 2 },
+      { question: "Which BIR form is used for annual income filing in the Philippines?", options: ["BIR Form 1901", "BIR Form 2316", "BIR Form 1701", "BIR Form 0605"], correct: 2 },
+      { question: "Which of the following is a financial statement?", options: ["Inventory Report", "Sales Invoice", "Balance Sheet", "Audit Letter"], correct: 2 },
+      { question: "What is the accounting equation?", options: ["Assets = Liabilities + Equity", "Assets = Revenue - Expenses", "Liabilities = Assets + Capital", "Equity = Income + Assets"], correct: 0 }
+    ];
+    let currentIndex = 0, score = 0, totalQuestions = 5;
+    const questionEl = document.getElementById("question"),
+          answersEl = document.getElementById("answers"),
+          resultEl = document.getElementById("result"),
+          nextBtn = document.getElementById("nextBtn"),
+          stopBtn = document.getElementById("stopBtn"),
+          finalScore = document.getElementById("final-score");
+
+    function loadQuestion() {
+      resultEl.textContent = "";
+      nextBtn.style.display = "none";
+      stopBtn.style.display = "none";
+      const q = questions[currentIndex];
+      questionEl.textContent = `Q${currentIndex + 1}: ${q.question}`;
+      answersEl.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(idx);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(index) {
+      const q = questions[currentIndex];
+      const buttons = answersEl.querySelectorAll("button");
+      buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === q.correct) btn.classList.add("correct");
+        else if (i === index) btn.classList.add("wrong");
+      });
+      resultEl.textContent = (index === q.correct) ? "Correct! 🎉" : "Wrong ❌";
+      if (index === q.correct) score++;
+      nextBtn.style.display = (currentIndex < totalQuestions - 1) ? "inline-block" : "none";
+      stopBtn.style.display = "inline-block";
+    }
+
+    nextBtn.onclick = () => {
+      currentIndex++;
+      if (currentIndex < totalQuestions) loadQuestion();
+      else showFinalScore();
+    };
+    stopBtn.onclick = showFinalScore;
+
+   function showFinalScore() {
+  document.getElementById("quiz-content").style.display = "none";
+  finalScore.style.display = "block";
+
+  let message = "";
+  if (score <= 1) {
+    message = "📚 You might want to study more about accounting.";
+  } else if (score <= 3) {
+    message = "💡 Not bad! Keep learning.";
+  } else {
+    message = "🚀 Great job! You have potential to join our team!";
+  }
+
+  finalScore.innerHTML = `
+    <h2>Your Score: ${score} / ${totalQuestions}</h2>
+    <p>${message}</p>
+    <a href="index.html" class="btn">Return to Home</a>
+  `;
+}
+
+
+    questions.sort(() => Math.random() - 0.5);
+    loadQuestion();
+  </script>
+</body>
+</html>
